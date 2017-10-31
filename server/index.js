@@ -37,13 +37,15 @@ app.get('/*', (req, res) => {
   } else {
     let response = [];
     setTimeout(() => {
-      console.log('TIMEOUT! Anything after this is not sent:', response);
-      try {
-        res.send(response);
-      } catch(e) {
-        console.log("It's okay, we delivered, ignore:", e);
+      if (!res.headersSent) {
+        console.log('TIMEOUT! Anything after this is not sent:', response);
+        try {
+          res.send(response);
+        } catch(e) {
+          console.log("It's okay, we delivered, ignore");
+        }
       }
-    }, 5000);
+    }, 2000);
     async.parallel([
       callback => {
         request({
@@ -66,7 +68,7 @@ app.get('/*', (req, res) => {
           console.error('Error getting fire data:', err);
           const processed = {fire: 'error'};
           response.push(processed);
-          callback(processed, null);
+          callback(null, processed);
         })
       },
       callback => {
@@ -90,21 +92,21 @@ app.get('/*', (req, res) => {
           console.error('Error getting crime data:', err);
           const processed = {crime: 'error'};
           response.push(processed);
-          callback(processed, null);
+          callback(null, processed);
         })
       }
     ], (err, data) => {
       console.error('Error:', err, '\nData:', data);
-        if (err) {
-          console.error('Error getting data:', err);
-          // response.push(err);
-          // res.status(400).send(err);
-        } else {
+      if (err) {
+        console.error('Error getting data:', err);
+        // response.push(err);
+        // res.status(400).send(err);
+      } else {
         try {
           console.log('Gateway successfully read from the microservices, current response:', data);
           res.status(200).send(data);
         } catch(e) {
-          console.log("Hmm, we timed out, usually not a good sign", e);
+          console.log("Hmm, we timed out, one or more microservices too slow:", e);
         }
       }
     })
