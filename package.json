@@ -1,0 +1,28 @@
+{
+  "name": "housespot",
+  "version": "1.0.0",
+  "description": "Gateway",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "server-dev": "nodemon --inspect server/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BitArchitect/HouseSpot.git"
+  },
+  "author": "Ja-on John Kim",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/BitArchitect/HouseSpot/issues"
+  },
+  "homepage": "https://github.com/BitArchitect/HouseSpot#readme",
+  "dependencies": {
+    "async": "^2.5.0",
+    "bluebird": "^3.5.1",
+    "express": "^4.16.1",
+    "path": "^0.12.7",
+    "request": "^2.83.0",
+    "request-promise": "^4.2.2"
+  }
+}
