@@ -118,30 +118,31 @@ app.get('/*', (req, res) => {
           response.push(processed);
           callback(null, processed);
         })
+      },
+      callback => {
+        request({
+          url: "http://13.57.63.47:1337/json",
+          method: "GET",
+          qs: {
+            zipcode: req.query.zipcode,
+            startDate: req.query.startDate,
+            endDate: req.query.endDate,
+            granularity: req.query.granularity
+          }
+        })
+        .then(data => {
+          console.log('house data:', data);
+          const processed = {house: JSON.parse(data)};
+          response.push(processed);
+          callback(null, processed);
+        })
+        .catch(err => {
+          console.error('Error getting house data:', err);
+          const processed = {house: 'error'};
+          response.push(processed);
+          callback(null, processed);
+        })
       }
-      // callback => {
-      //   request({
-      //     url: "https://",
-      //     method: "GET",
-      //     qs: {
-      //       zipcode: req.query.zipcode,
-      //       startDate: req.query.startDate,
-      //       endDate: req.query.endDate
-      //     }
-      //   })
-      //   .then(data => {
-      //     console.log('crime data:', data);
-      //     const processed = {crime: JSON.parse(data)};
-      //     response.push(processed);
-      //     callback(null, processed);
-      //   })
-      //   .catch(err => {
-      //     console.error('Error getting crime data:', err);
-      //     const processed = {crime: 'error'};
-      //     response.push(processed);
-      //     callback(null, processed);
-      //   })
-      // }
     ], (err, data) => {
       if (err) {
         console.error('Error getting data:', err);
