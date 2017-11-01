@@ -53,9 +53,9 @@ app.get('/*', (req, res) => {
           method: "GET",
           qs: {
             zipcode: req.query.zipcode,
-            granularity: req.query.granularity,
             startDate: req.query.startDate,
-            endDate: req.query.endDate
+            endDate: req.query.endDate,
+            granularity: req.query.granularity
           }
         })
         .then(data => {
@@ -77,9 +77,9 @@ app.get('/*', (req, res) => {
           method: "GET",
           qs: {
             zipcode: req.query.zipcode,
-            granularity: req.query.granularity,
             startDate: req.query.startDate,
-            endDate: req.query.endDate
+            endDate: req.query.endDate,
+            granularity: req.query.granularity
           }
         })
         .then(data => {
@@ -101,9 +101,9 @@ app.get('/*', (req, res) => {
           method: "GET",
           qs: {
             zipcode: req.query.zipcode,
-            granularity: req.query.granularity,
             startDate: req.query.startDate,
-            endDate: req.query.endDate
+            endDate: req.query.endDate,
+            granularity: req.query.granularity
           }
         })
         .then(data => {
