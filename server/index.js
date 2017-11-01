@@ -74,7 +74,7 @@ app.get('/*', (req, res) => {
       callback => {
         request({
           url: "https://crime-spot.herokuapp.com/crime/json",
-          method: "POST",
+          method: "GET",
           qs: {
             zipcode: req.query.zipcode,
             granularity: req.query.granularity,
@@ -94,9 +94,55 @@ app.get('/*', (req, res) => {
           response.push(processed);
           callback(null, processed);
         })
+      },
+      callback => {
+        request({
+          url: "https://healthinspectiondata.herokuapp.com/inspectionscore/json",
+          method: "GET",
+          qs: {
+            zipcode: req.query.zipcode,
+            granularity: req.query.granularity,
+            startDate: req.query.startDate,
+            endDate: req.query.endDate
+          }
+        })
+        .then(data => {
+          console.log('health inspeciton data:', data);
+          const processed = {healthInspection: JSON.parse(data)};
+          response.push(processed);
+          callback(null, processed);
+        })
+        .catch(err => {
+          console.error('Error getting health inspection data:', err);
+          const processed = {health: 'error'};
+          response.push(processed);
+          callback(null, processed);
+        })
       }
+      // callback => {
+      //   request({
+      //     url: "https://",
+      //     method: "GET",
+      //     qs: {
+      //       zipcode: req.query.zipcode,
+      //       startDate: req.query.startDate,
+      //       endDate: req.query.endDate
+      //     }
+      //   })
+      //   .then(data => {
+      //     console.log('crime data:', data);
+      //     const processed = {crime: JSON.parse(data)};
+      //     response.push(processed);
+      //     callback(null, processed);
+      //   })
+      //   .catch(err => {
+      //     console.error('Error getting crime data:', err);
+      //     const processed = {crime: 'error'};
+      //     response.push(processed);
+      //     callback(null, processed);
+      //   })
+      // }
     ], (err, data) => {
-      console.error('Error:', err, '\nData:', data);
       if (err) {
         console.error('Error getting data:', err);
         // response.push(err);
