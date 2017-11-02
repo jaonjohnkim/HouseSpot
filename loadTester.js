@@ -48,6 +48,9 @@ setInterval(() => {
   .then(data => {
     statsDClient.increment('.loadTester.query.success');
     statsDClient.timing('.loadTester.query.success.latency_ms', Date.now() - start);
+    data.forEach(data => {
+      if ()
+    })
   })
   .catch(error => {
     statsDClient.increment('.loadTester.query.fail');
