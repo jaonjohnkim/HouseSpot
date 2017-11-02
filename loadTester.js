@@ -1,4 +1,10 @@
 const request = require('request-promise');
+const statsD = require('node-statsd');
+const statsDClient = new statsD({
+  host: 'statsd.hostedgraphite.com',
+  port: 8125,
+  prefix: process.env.HOSTEDGRAPHITE_APIKEY
+});
 
 setInterval(() => {
   const zipcodes = [
@@ -35,6 +41,17 @@ setInterval(() => {
   let zipcode = zipcodes[Math.round(Math.random() * (zipcodes.length - 1))];
   let gran = granularity[Math.round(Math.random() * (granularity.length - 1))];
   // zipcode = 94111;
+
+
+  const start = Date.now();
   request(`https://housespot.herokuapp.com/json?zipcode=${zipcode}&startDate=2017-07-01T00:00:00.000&endDate=2017-10-25T00:00:00.000&granularity=${gran}`)
+  .then(data => {
+    statsDClient.increment('.loadTester.query.success');
+    statsDClient.timing('.loadTester.query.success.latency_ms', Date.now() - start);
+  })
+  .catch(error => {
+    statsDClient.increment('.loadTester.query.fail');
+    statsDClient.timing('.loadTester.query.fail.latency_ms', Date.now() - start);
+  })
   console.log('Pinged for zipcode:', zipcode);
-}, 10);
+}, 50);
