@@ -54,4 +54,4 @@ setInterval(() => {
     statsDClient.timing('.loadTester.query.fail.latency_ms', Date.now() - start);
   })
   console.log('Pinged for zipcode:', zipcode);
-}, 50);
+}, 25);
