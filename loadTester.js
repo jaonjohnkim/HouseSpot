@@ -1,10 +1,12 @@
 const request = require('request-promise');
+console.log('process.env:', process.env);
 const statsD = require('node-statsd');
 const statsDClient = new statsD({
   host: 'statsd.hostedgraphite.com',
   port: 8125,
   prefix: process.env.HOSTEDGRAPHITE_APIKEY
 });
+
 
 setInterval(() => {
   const zipcodes = [
@@ -48,8 +50,20 @@ setInterval(() => {
   .then(data => {
     statsDClient.increment('.loadTester.query.success');
     statsDClient.timing('.loadTester.query.success.latency_ms', Date.now() - start);
-    data.forEach(data => {
-      if ()
+    data.forEach(obj => {
+      if (obj.fire) {
+        if (obj.fire === "error") statsDClient.increment('.loadTester.query.fire.fail');
+        else statsDClient.increment('.loadTester.query.fire.success');
+      } else if (obj.crime) {
+        if (obj.crime === "error") statsDClient.increment('.loadTester.query.crime.fail');
+        else statsDClient.increment('.loadTester.query.crime.success');
+      } else if (obj.house) {
+        if (obj.house === "error") statsDClient.increment('.loadTester.query.house.fail');
+        else statsDClient.increment('.loadTester.query.house.success');
+      } else if (obj.health) {
+        if (obj.health === "error") statsDClient.increment('.loadTester.query.health.fail');
+        else statsDClient.increment('.loadTester.query.health.success');
+      }
     })
   })
   .catch(error => {
@@ -57,4 +71,7 @@ setInterval(() => {
     statsDClient.timing('.loadTester.query.fail.latency_ms', Date.now() - start);
   })
   console.log('Pinged for zipcode:', zipcode);
-}, 25);
+}, (1000 / process.env.QPS) || 100);
+
+qps * something = ms;
+something = 1000 / q
