@@ -72,6 +72,3 @@ setInterval(() => {
   })
   console.log('Pinged for zipcode:', zipcode);
 }, (1000 / process.env.QPS) || 100);
-
-qps * something = ms;
-something = 1000 / q
