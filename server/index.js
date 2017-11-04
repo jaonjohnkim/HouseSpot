@@ -73,7 +73,7 @@ app.get('/*', (req, res) => {
         .then(data => {
           statsDClient.increment('.gateway.fire.query.response.success');
           statsDClient.timing('.gateway.fire.query.response.success.latency_ms', Date.now() - start);
-          console.log('fire data:', data);
+          // console.log('fire data:', data);
           const processed = {fire: JSON.parse(data)};
           response.push(processed);
           callback(null, processed);
@@ -102,7 +102,7 @@ app.get('/*', (req, res) => {
         .then(data => {
           statsDClient.increment('.gateway.crime.query.response.success');
           statsDClient.timing('.gateway.crime.query.response.success.latency_ms', Date.now() - start);
-          console.log('crime data:', data);
+          // console.log('crime data:', data);
           const processed = {crime: JSON.parse(data)};
           response.push(processed);
           callback(null, processed);
@@ -130,7 +130,7 @@ app.get('/*', (req, res) => {
         .then(data => {
           statsDClient.increment('.gateway.health.query.response.success');
           statsDClient.timing('.gateway.health.query.response.success.latency_ms', Date.now() - start);
-          console.log('health inspeciton data:', data);
+          // console.log('health inspeciton data:', data);
           const processed = {healthInspection: JSON.parse(data)};
           response.push(processed);
           callback(null, processed);
@@ -158,7 +158,7 @@ app.get('/*', (req, res) => {
         .then(data => {
           statsDClient.increment('.gateway.house.query.response.success');
           statsDClient.timing('.gateway.house.query.response.success.latency_ms', Date.now() - start);
-          console.log('house data:', data);
+          // console.log('house data:', data);
           const processed = {house: JSON.parse(data)};
           response.push(processed);
           callback(null, processed);
@@ -179,7 +179,7 @@ app.get('/*', (req, res) => {
         // res.status(400).send(err);
       } else {
         try {
-          console.log('Gateway successfully read from the microservices, current response:', data);
+          // console.log('Gateway successfully read from the microservices, current response:', data);
           if (!res.headersSent) {
             res.status(200).send(data);
             statsDClient.increment('.gateway.response.success');

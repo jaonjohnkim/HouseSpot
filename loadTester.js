@@ -1,5 +1,5 @@
 const request = require('request-promise');
-console.log('process.env:', process.env);
+// console.log('process.env:', process.env);
 const statsD = require('node-statsd');
 const statsDClient = new statsD({
   host: 'statsd.hostedgraphite.com',
