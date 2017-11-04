@@ -48,6 +48,7 @@ setInterval(() => {
   const start = Date.now();
   request.get(`https://housespot.herokuapp.com/json?zipcode=${zipcode}&startDate=2017-07-01T00:00:00.000&endDate=2017-10-25T00:00:00.000&granularity=${gran}`)
   .then(data => {
+    data = JSON.parse(data);
     statsDClient.increment('.loadTester.query.success');
     statsDClient.timing('.loadTester.query.success.latency_ms', Date.now() - start);
     data.forEach(obj => {

@@ -21,7 +21,7 @@
   "dependencies": {
     "async": "^2.5.0",
     "bluebird": "^3.5.1",
-    "express": "^4.16.1",
+    "express": "^4.16.2",
     "node-statsd": "^0.1.1",
     "path": "^0.12.7",
     "request": "^2.83.0",
