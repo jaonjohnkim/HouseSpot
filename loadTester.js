@@ -51,22 +51,14 @@ setInterval(() => {
     statsDClient.increment('.loadTester.query.success');
     statsDClient.timing('.loadTester.query.success.latency_ms', Date.now() - start);
     data.forEach(obj => {
-      if (obj.fire) {
-        if (obj.fire === "error") statsDClient.increment('.loadTester.query.fire.fail');
-        else statsDClient.increment('.loadTester.query.fire.success');
-      } else if (obj.crime) {
-        if (obj.crime === "error") statsDClient.increment('.loadTester.query.crime.fail');
-        else statsDClient.increment('.loadTester.query.crime.success');
-      } else if (obj.house) {
-        if (obj.house === "error") statsDClient.increment('.loadTester.query.house.fail');
-        else statsDClient.increment('.loadTester.query.house.success');
-      } else if (obj.health) {
-        if (obj.health === "error") statsDClient.increment('.loadTester.query.health.fail');
-        else statsDClient.increment('.loadTester.query.health.success');
-      }
+      obj.fire === "error" ? statsDClient.increment('.loadTester.query.fire.fail') : statsDClient.increment('.loadTester.query.fire.success');
+      obj.crime === "error" ? statsDClient.increment('.loadTester.query.crime.fail') : statsDClient.increment('.loadTester.query.crime.success');
+      obj.house === "error" ? statsDClient.increment('.loadTester.query.house.fail') : statsDClient.increment('.loadTester.query.house.success');
+      obj.health === "error" ? statsDClient.increment('.loadTester.query.health.fail') : statsDClient.increment('.loadTester.query.health.success');
     })
   })
   .catch(error => {
+    console.error(error);
     statsDClient.increment('.loadTester.query.fail');
     statsDClient.timing('.loadTester.query.fail.latency_ms', Date.now() - start);
   })
