@@ -1,2 +1,3 @@
 web:    node server/index.js
-loadTester:  node loadTester.js
+defaultLoadTester:  node defaultQueryLoadTester.js
+customLoadTester:  node customQueryLoadTester.js

@@ -35,6 +35,13 @@ const statsDClient = new statsD({
 // app.use()
 // app.use(bodyParser.urlencoded({ extended: true }));
 // app.use(bodyParser.json());
+const formatIntoObj = data => {
+  return data.reduce((acc, val) => {
+    const key = Object.getOwnPropertyNames(val)[0];
+    acc[key] = val[key];
+    return acc;
+  }, {})
+}
 
 app.get('/*', (req, res) => {
   const start = Date.now();
@@ -47,9 +54,9 @@ app.get('/*', (req, res) => {
     setTimeout(() => {
       if (!res.headersSent) {
         console.log('TIMEOUT! Anything after this is not sent:', response);
-
+        console.log('formatted:', formatIntoObj(response));
         try {
-          res.send(response);
+          res.send(formatIntoObj(response));
           statsDClient.increment('.gateway.response.timeout');
           statsDClient.increment('.gateway.response.success');
           statsDClient.timing('.gateway.response.timeout.latency_ms', Date.now() - start);
@@ -181,7 +188,8 @@ app.get('/*', (req, res) => {
         try {
           // console.log('Gateway successfully read from the microservices, current response:', data);
           if (!res.headersSent) {
-            res.status(200).send(data);
+            console.log('formatted:', formatIntoObj(data));
+            res.status(200).send(formatIntoObj(data));
             statsDClient.increment('.gateway.response.success');
             statsDClient.timing('.gateway.response.success.latency_ms', Date.now() - start);
           }
