@@ -63,11 +63,13 @@ const loadTest = () => {
   console.log('Current QPS:', QPS);
   // console.log('Next timer:', testEnd);
 }
+
 let prevTest = null;
 setInterval(() => {
   if (prevTest) clearInterval(prevTest);
   if (QPS <= QPSlimit) {
-    prevTest = setInterval(loadTest, Math.round(1000 / QPS));
+    console.log('Current QPS:', QPS);
+    prevTest = setInterval(() => {loadTest()}, Math.round(1000 / QPS));
   }
   QPS++;
 }, 1000 * 60)
