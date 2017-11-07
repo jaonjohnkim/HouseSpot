@@ -67,5 +67,5 @@ const loadTest = setInterval(() => {
     statsDClient.increment('.loadTester.query.fail');
     statsDClient.timing('.loadTester.query.fail.latency_ms', Date.now() - start);
   })
-  console.log('Pinged for zipcode:', zipcode);
+  // console.log('Pinged for zipcode:', zipcode);
 }, (Math.round(1000 / QPS)) || 100);

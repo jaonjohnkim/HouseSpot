@@ -61,7 +61,7 @@ app.get('/*', (req, res) => {
           statsDClient.increment('.gateway.response.success');
           statsDClient.timing('.gateway.response.timeout.latency_ms', Date.now() - start);
         } catch(e) {
-          console.log("It's okay, we delivered, ignore");
+          // console.log("It's okay, we delivered, ignore");
         }
       }
     }, 2000);
