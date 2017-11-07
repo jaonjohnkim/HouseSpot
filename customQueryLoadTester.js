@@ -23,10 +23,18 @@ const timerInMin = (now, min) => {
   return new Date(now.getTime() + 1000*60*min);
 }
 
-let testEnd = timer(Date.now(), 5);
-const firstTest = setInterval(() => {
+let timer = 1;
+let testEnd = timerInMin(Date.now(), timer);
+let QPS = 1;
+let QPSlimit = 200;
+const loadTest = setInterval(() => {
   if (Date.now() >= testEnd.getTime()) {
-    clearInterval(firstTest);
+    if (QPS !== QPSlimit) {
+      QPS++;
+    } else if (QPS === QPSlimit) {
+      clearInterval(loadTest);
+    }
+    testEnd = timerInMin(Date.now(), timer);
   }
   const zipcodes = [
     94102,94103,94104,94105,94107,94108,94109,94110,94111,94112,94114,94115,94116,
@@ -65,4 +73,4 @@ const firstTest = setInterval(() => {
     statsDClient.timing('.loadTester.query.fail.latency_ms', Date.now() - start);
   })
   console.log('Pinged for zipcode:', zipcode);
-}, (1000 / process.env.QPS) || 100);
+}, (1000 / QPS) || 100);

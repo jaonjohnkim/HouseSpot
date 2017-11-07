@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node server/index.js",
     "server-dev": "nodemon --inspect server/index.js",
-    "loadTest": "node loadTester.js"
+    "defaultLoadTest": "node defaultQueryLoadTester.js",
+    "customLoadTest": "node customQueryLoadTester.js"
   },
   "repository": {
     "type": "git",
