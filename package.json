@@ -4,7 +4,7 @@
   "description": "Gateway",
   "main": "index.js",
   "scripts": {
-    "start": "node server/index.js",
+    "start": "node pm2.js",
     "server-dev": "nodemon --inspect server/index.js",
     "defaultLoadTest": "node defaultQueryLoadTester.js",
     "customLoadTest": "node customQueryLoadTester.js"
