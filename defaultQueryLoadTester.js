@@ -31,7 +31,8 @@ const loadTest = () => {
   let endDate = stringifyDate(new Date());
   statsDClient.increment('.loadTester.query.all');
   const start = Date.now();
-  request.get(`https://housespot.herokuapp.com/json?zipcode=${zipcode}&startDate=${startDate}&endDate=${endDate}&granularity=${gran}`)
+  // request.get(`https://housespot.herokuapp.com/json?zipcode=${zipcode}&startDate=${startDate}&endDate=${endDate}&granularity=${gran}`)
+  request.get(`ec2-54-183-140-170.us-west-1.compute.amazonaws.com:3000/json?zipcode=${zipcode}&startDate=${startDate}&endDate=${endDate}&granularity=${gran}`)
   .then(data => {
     data = JSON.parse(data);
     statsDClient.increment('.loadTester.query.success');
