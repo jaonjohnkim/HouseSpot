@@ -53,8 +53,8 @@ app.get('/*', (req, res) => {
     let response = [];
     setTimeout(() => {
       if (!res.headersSent) {
-        console.log('TIMEOUT! Anything after this is not sent:', response);
-        console.log('formatted:', formatIntoObj(response));
+        // console.log('TIMEOUT! Anything after this is not sent:', response);
+        // console.log('formatted:', formatIntoObj(response));
         try {
           res.send(formatIntoObj(response));
           statsDClient.increment('.gateway.response.timeout');
@@ -188,7 +188,7 @@ app.get('/*', (req, res) => {
         try {
           // console.log('Gateway successfully read from the microservices, current response:', data);
           if (!res.headersSent) {
-            console.log('formatted:', formatIntoObj(data));
+            // console.log('formatted:', formatIntoObj(data));
             res.status(200).send(formatIntoObj(data));
             statsDClient.increment('.gateway.response.success');
             statsDClient.timing('.gateway.response.success.latency_ms', Date.now() - start);
