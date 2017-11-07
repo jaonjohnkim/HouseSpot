@@ -19,23 +19,9 @@ const randomDate = (start, end) => {
   return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
 }
 
-const timerInMin = (now, min) => {
-  return new Date(now.getTime() + 1000*60*min);
-}
-
-let timer = 1;
-let testEnd = timerInMin(new Date(), timer);
 let QPS = 1;
 let QPSlimit = 200;
-const loadTest = setInterval(() => {
-  if (Date.now() >= testEnd.getTime()) {
-    if (QPS !== QPSlimit) {
-      QPS++;
-    } else if (QPS === QPSlimit) {
-      clearInterval(loadTest);
-    }
-    testEnd = timerInMin(new Date(), timer);
-  }
+const loadTest = () => {
   const zipcodes = [
     94102,94103,94104,94105,94107,94108,94109,94110,94111,94112,94114,94115,94116,
     94117,94118,94121,94122,94123,94124,94127,94129,94130,94131,94132,94133,94134,94158
@@ -47,6 +33,7 @@ const loadTest = setInterval(() => {
   let endDate = randomDate(startDate, new Date());
   startDate = stringifyDate(startDate);
   endDate = stringifyDate(endDate);
+  statsDClient.increment('.loadTester.query.all');
   const start = Date.now();
   request.get(`https://housespot.herokuapp.com/json?zipcode=${zipcode}&startDate=${startDate}&endDate=${endDate}&granularity=${gran}`)
   .then(data => {
@@ -72,5 +59,16 @@ const loadTest = setInterval(() => {
     statsDClient.increment('.loadTester.query.fail');
     statsDClient.timing('.loadTester.query.fail.latency_ms', Date.now() - start);
   })
-  console.log('Pinged for zipcode:', zipcode);
-}, (1000 / QPS) || 100);
+  // console.log('Pinged for zipcode:', zipcode);
+  console.log('Current QPS:', QPS);
+}
+
+let prevTest = null;
+setInterval(() => {
+  if (prevTest) clearInterval(prevTest);
+  if (QPS <= QPSlimit) {
+    console.log('Current QPS:', QPS);
+    prevTest = setInterval(loadTest, Math.round(1000 / QPS));
+  }
+  QPS++;
+}, 1000 * 60)

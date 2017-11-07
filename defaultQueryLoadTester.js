@@ -15,11 +15,6 @@ const stringifyDate = (date) => {
   return `${date.getFullYear()}-${month}-${dateNum}T00:00:00.000`;
 }
 
-// const timerInMin = (now, min) => {
-//   return new Date(now.getTime() + 1000*60*min);
-// }
-// let timer = 1;
-// let testEnd = timerInMin(new Date(), timer);
 let QPS = 1;
 let QPSlimit = 200;
 const loadTest = () => {
@@ -34,6 +29,7 @@ const loadTest = () => {
   threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
   let startDate = stringifyDate(threeMonthsAgo);
   let endDate = stringifyDate(new Date());
+  statsDClient.increment('.loadTester.query.all');
   const start = Date.now();
   request.get(`https://housespot.herokuapp.com/json?zipcode=${zipcode}&startDate=${startDate}&endDate=${endDate}&granularity=${gran}`)
   .then(data => {
