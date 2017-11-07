@@ -24,7 +24,7 @@ const timerInMin = (now, min) => {
 }
 
 let timer = 1;
-let testEnd = timerInMin(Date.now(), timer);
+let testEnd = timerInMin(new Date(), timer);
 let QPS = 1;
 let QPSlimit = 200;
 const loadTest = setInterval(() => {
@@ -34,7 +34,7 @@ const loadTest = setInterval(() => {
     } else if (QPS === QPSlimit) {
       clearInterval(loadTest);
     }
-    testEnd = timerInMin(Date.now(), timer);
+    testEnd = timerInMin(new Date(), timer);
   }
   const zipcodes = [
     94102,94103,94104,94105,94107,94108,94109,94110,94111,94112,94114,94115,94116,
