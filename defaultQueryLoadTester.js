@@ -61,7 +61,7 @@ const loadTest = () => {
   })
   // console.log('Pinged for zipcode:', zipcode);
   console.log('Current QPS:', QPS);
-  console.log('Next timer:', testEnd);
+  // console.log('Next timer:', testEnd);
 }
 let prevTest = null;
 setInterval(() => {
@@ -69,4 +69,5 @@ setInterval(() => {
   if (QPS <= QPSlimit) {
     prevTest = setInterval(loadTest, Math.round(1000 / QPS));
   }
+  QPS++;
 }, 1000 * 60)
