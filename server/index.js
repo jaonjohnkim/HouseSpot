@@ -5,7 +5,6 @@ const bodyParser = require('body-parser');
 const url = require('url');
 const app = express();
 const statsD = require('node-statsd');
-const
 const statsDClient = new statsD({
   host: 'statsd.hostedgraphite.com',
   port: 8125,
