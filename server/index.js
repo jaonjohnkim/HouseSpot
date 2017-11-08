@@ -69,7 +69,7 @@ app.get('/*', (req, res) => {
       callback => {
         request({
           // url: "https://fireincident.herokuapp.com/json",
-          url: "http://13.57.114.167:3000/json"
+          url: "http://13.57.114.167:3000/json",
           method: "GET",
           qs: {
             zipcode: req.query.zipcode,
