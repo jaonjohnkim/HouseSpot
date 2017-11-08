@@ -69,8 +69,8 @@ app.get('/*', (req, res) => {
     async.parallel([
       callback => {
         request({
-          url: "https://fireincident.herokuapp.com/json",
-          // url: "ec2-54-153-122-132.us-west-1.compute.amazonaws.com:3000/json"
+          // url: "https://fireincident.herokuapp.com/json",
+          url: "http://ec2-54-153-122-132.us-west-1.compute.amazonaws.com:3000/json"
           method: "GET",
           qs: {
             zipcode: req.query.zipcode,
@@ -99,8 +99,8 @@ app.get('/*', (req, res) => {
       },
       callback => {
         request({
-          url: "https://crime-spot.herokuapp.com/crime/json",
-          // url: "ec2-52-53-166-50.us-west-1.compute.amazonaws.com:3000/crime/json",
+          // url: "https://crime-spot.herokuapp.com/crime/json",
+          url: "http://ec2-52-53-166-50.us-west-1.compute.amazonaws.com:3000/crime/json",
           method: "GET",
           qs: {
             zipcode: req.query.zipcode,
@@ -128,8 +128,8 @@ app.get('/*', (req, res) => {
       },
       callback => {
         request({
-          url: "https://healthinspectiondata.herokuapp.com/inspectionscore/json",
-          // url: "ec2-13-56-213-244.us-west-1.compute.amazonaws.com:3000/inspectionscore/json",
+          // url: "https://healthinspectiondata.herokuapp.com/inspectionscore/json",
+          url: "http://ec2-13-56-213-244.us-west-1.compute.amazonaws.com:3000/inspectionscore/json",
           method: "GET",
           qs: {
             zipcode: req.query.zipcode,
