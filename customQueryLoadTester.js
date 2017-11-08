@@ -19,7 +19,7 @@ const randomDate = (start, end) => {
   return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
 }
 
-let QPS = 1;
+let QPS = process.env.QPS;
 let QPSlimit = 200;
 const loadTest = () => {
   const zipcodes = [

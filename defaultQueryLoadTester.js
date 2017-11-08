@@ -15,7 +15,7 @@ const stringifyDate = (date) => {
   return `${date.getFullYear()}-${month}-${dateNum}T00:00:00.000`;
 }
 
-let QPS = 1;
+let QPS = process.env.QPS;
 let QPSlimit = 200;
 const loadTest = () => {
   const zipcodes = [
