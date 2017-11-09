@@ -64,7 +64,7 @@ app.get('/*', (req, res) => {
           // console.log("It's okay, we delivered, ignore");
         }
       }
-    }, 2000);
+    }, 200);
     async.parallel([
       callback => {
         request({
@@ -96,35 +96,35 @@ app.get('/*', (req, res) => {
           callback(null, processed);
         })
       },
-      callback => {
-        request({
-          // url: "https://crime-spot.herokuapp.com/crime/json",
-          url: "http://ec2-52-53-166-50.us-west-1.compute.amazonaws.com:3000/crime/json",
-          method: "GET",
-          qs: {
-            zipcode: req.query.zipcode,
-            startDate: req.query.startDate,
-            endDate: req.query.endDate,
-            granularity: req.query.granularity
-          }
-        })
-        .then(data => {
-          statsDClient.increment('.gateway.crime.query.response.success');
-          statsDClient.timing('.gateway.crime.query.response.success.latency_ms', Date.now() - start);
-          // console.log('crime data:', data);
-          const processed = {crime: JSON.parse(data)};
-          response.push(processed);
-          callback(null, processed);
-        })
-        .catch(err => {
-          statsDClient.increment('.gateway.crime.query.response.fail');
-          statsDClient.timing('.gateway.crime.query.response.fail.latency_ms', Date.now() - start);
-          console.error('Error getting crime data:', err);
-          const processed = {crime: 'error'};
-          response.push(processed);
-          callback(null, processed);
-        })
-      },
+      // callback => {
+      //   request({
+      //     // url: "https://crime-spot.herokuapp.com/crime/json",
+      //     url: "http://ec2-52-53-166-50.us-west-1.compute.amazonaws.com:3000/crime/json",
+      //     method: "GET",
+      //     qs: {
+      //       zipcode: req.query.zipcode,
+      //       startDate: req.query.startDate,
+      //       endDate: req.query.endDate,
+      //       granularity: req.query.granularity
+      //     }
+      //   })
+      //   .then(data => {
+      //     statsDClient.increment('.gateway.crime.query.response.success');
+      //     statsDClient.timing('.gateway.crime.query.response.success.latency_ms', Date.now() - start);
+      //     // console.log('crime data:', data);
+      //     const processed = {crime: JSON.parse(data)};
+      //     response.push(processed);
+      //     callback(null, processed);
+      //   })
+      //   .catch(err => {
+      //     statsDClient.increment('.gateway.crime.query.response.fail');
+      //     statsDClient.timing('.gateway.crime.query.response.fail.latency_ms', Date.now() - start);
+      //     console.error('Error getting crime data:', err);
+      //     const processed = {crime: 'error'};
+      //     response.push(processed);
+      //     callback(null, processed);
+      //   })
+      // },
       callback => {
         request({
           // url: "https://healthinspectiondata.herokuapp.com/inspectionscore/json",
