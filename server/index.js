@@ -1,9 +1,9 @@
 const express = require('express');
 const async = require('async');
 const request = require('request-promise');
-const bodyParser = require('body-parser');
-const url = require('url');
 const app = express();
+const os = require('os');
+const osUtil = require('os-utils');
 const statsD = require('node-statsd');
 const statsDClient = new statsD({
   host: 'statsd.hostedgraphite.com',
@@ -11,30 +11,7 @@ const statsDClient = new statsD({
   prefix: process.env.HOSTEDGRAPHITE_APIKEY
 });
 
-// const asyncTasks = [
-//   callback => {
-//     request({
-//       url: "fireincident.herokuapp.com/json",
-//       method: "GET",
-//       qs: {
-//         zipcode: ,
-//         granularity: ,
-//         startDate: ,
-//         endDate:
-//       }
-//     })
-//     .then(data => {
-//       callback(null, data);
-//     })
-//     .catch(err => {
-//       callback(err, null);
-//     })
-//   }
-// ];
 
-// app.use()
-// app.use(bodyParser.urlencoded({ extended: true }));
-// app.use(bodyParser.json());
 const formatIntoObj = data => {
   return data.reduce((acc, val) => {
     const key = Object.getOwnPropertyNames(val)[0];
@@ -44,6 +21,12 @@ const formatIntoObj = data => {
 }
 
 app.get('/*', (req, res) => {
+  statsDClient.gauge('.gateway.cpu.speed', parseInt(os.cpus().speed) * 1000000);
+  osUtil.cpuUsage((v) => {
+    statsDClient.gauge('.gateway.cpu.percent', v);
+  })
+  statsDClient.gauge('.gateway.memory.used', os.totalmem() - os.freemem());
+  statsDClient.gauge('.gateway.memory.total', os.freemem());
   const start = Date.now();
   statsDClient.increment('.gateway.query.all');
   // console.log('Request:', req);
