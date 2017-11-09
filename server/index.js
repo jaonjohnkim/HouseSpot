@@ -51,7 +51,7 @@ app.get('/*', (req, res) => {
     res.send('Gateway Server Online');
   } else {
     let response = [];
-    setTimeout(() => {
+    const SLA = setTimeout(() => {
       if (!res.headersSent) {
         // console.log('TIMEOUT! Anything after this is not sent:', response);
         // console.log('formatted:', formatIntoObj(response));
@@ -60,6 +60,18 @@ app.get('/*', (req, res) => {
           statsDClient.increment('.gateway.response.timeout');
           statsDClient.increment('.gateway.response.success');
           statsDClient.timing('.gateway.response.timeout.latency_ms', Date.now() - start);
+          try {
+            global.fire.abort();
+          } catch(e) {}
+          try {
+            global.crime.abort();
+          } catch(e) {}
+          try {
+            global.health.abort();
+          } catch(e) {}
+          try {
+            global.house.abort();
+          } catch(e) {}
         } catch(e) {
           // console.log("It's okay, we delivered, ignore");
         }
@@ -67,7 +79,7 @@ app.get('/*', (req, res) => {
     }, 200);
     async.parallel([
       callback => {
-        request({
+        global.fire = request({
           // url: "https://fireincident.herokuapp.com/json",
           url: "http://13.57.114.167:3000/json",
           method: "GET",
@@ -97,7 +109,7 @@ app.get('/*', (req, res) => {
         })
       },
       // callback => {
-      //   request({
+      //   global.crime = request({
       //     // url: "https://crime-spot.herokuapp.com/crime/json",
       //     url: "http://ec2-52-53-166-50.us-west-1.compute.amazonaws.com:3000/crime/json",
       //     method: "GET",
@@ -126,7 +138,7 @@ app.get('/*', (req, res) => {
       //   })
       // },
       callback => {
-        request({
+        global.health = request({
           // url: "https://healthinspectiondata.herokuapp.com/inspectionscore/json",
           url: "http://ec2-13-56-213-244.us-west-1.compute.amazonaws.com:3000/inspectionscore/json",
           method: "GET",
@@ -155,7 +167,7 @@ app.get('/*', (req, res) => {
         })
       },
       callback => {
-        request({
+        global.house = request({
           url: "http://13.57.63.47:1337/json",
           method: "GET",
           qs: {
@@ -193,6 +205,7 @@ app.get('/*', (req, res) => {
           if (!res.headersSent) {
             // console.log('formatted:', formatIntoObj(data));
             res.status(200).send(formatIntoObj(data));
+            clearTimeout(SLA);
             statsDClient.increment('.gateway.response.success');
             statsDClient.timing('.gateway.response.success.latency_ms', Date.now() - start);
           }
