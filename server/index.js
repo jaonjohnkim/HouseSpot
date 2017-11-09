@@ -137,35 +137,35 @@ app.get('/*', (req, res) => {
       //     callback(null, processed);
       //   })
       // },
-      callback => {
-        global.health = request({
-          // url: "https://healthinspectiondata.herokuapp.com/inspectionscore/json",
-          url: "http://ec2-13-56-213-244.us-west-1.compute.amazonaws.com:3000/inspectionscore/json",
-          method: "GET",
-          qs: {
-            zipcode: req.query.zipcode,
-            startDate: req.query.startDate,
-            endDate: req.query.endDate,
-            granularity: req.query.granularity
-          }
-        })
-        .then(data => {
-          statsDClient.increment('.gateway.health.query.response.success');
-          statsDClient.timing('.gateway.health.query.response.success.latency_ms', Date.now() - start);
-          // console.log('health inspeciton data:', data);
-          const processed = {healthInspection: JSON.parse(data)};
-          response.push(processed);
-          callback(null, processed);
-        })
-        .catch(err => {
-          statsDClient.increment('.gateway.health.query.response.fail');
-          statsDClient.timing('.gateway.health.query.response.fail.latency_ms', Date.now() - start);
-          console.error('Error getting health inspection data:', err);
-          const processed = {health: 'error'};
-          response.push(processed);
-          callback(null, processed);
-        })
-      },
+      // callback => {
+      //   global.health = request({
+      //     // url: "https://healthinspectiondata.herokuapp.com/inspectionscore/json",
+      //     url: "http://ec2-13-56-213-244.us-west-1.compute.amazonaws.com:3000/inspectionscore/json",
+      //     method: "GET",
+      //     qs: {
+      //       zipcode: req.query.zipcode,
+      //       startDate: req.query.startDate,
+      //       endDate: req.query.endDate,
+      //       granularity: req.query.granularity
+      //     }
+      //   })
+      //   .then(data => {
+      //     statsDClient.increment('.gateway.health.query.response.success');
+      //     statsDClient.timing('.gateway.health.query.response.success.latency_ms', Date.now() - start);
+      //     // console.log('health inspeciton data:', data);
+      //     const processed = {healthInspection: JSON.parse(data)};
+      //     response.push(processed);
+      //     callback(null, processed);
+      //   })
+      //   .catch(err => {
+      //     statsDClient.increment('.gateway.health.query.response.fail');
+      //     statsDClient.timing('.gateway.health.query.response.fail.latency_ms', Date.now() - start);
+      //     console.error('Error getting health inspection data:', err);
+      //     const processed = {health: 'error'};
+      //     response.push(processed);
+      //     callback(null, processed);
+      //   })
+      // },
       callback => {
         global.house = request({
           url: "http://13.57.63.47:1337/json",
