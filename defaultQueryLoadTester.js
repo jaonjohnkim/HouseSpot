@@ -76,5 +76,5 @@ setInterval(() => {
     console.log('Current QPS:', QPS);
     prevTest = setInterval(loadTest, Math.round(1000 / QPS));
   }
-  QPS+=5;
+  QPS+=2;
 }, 1000 * 60)

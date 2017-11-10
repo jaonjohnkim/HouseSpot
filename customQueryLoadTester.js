@@ -1,5 +1,6 @@
 const request = require('request-promise');
-// console.log('process.env:', process.env);
+const os = require('os');
+const osUtil = require('os-utils')
 const statsD = require('node-statsd');
 const statsDClient = new statsD({
   host: 'statsd.hostedgraphite.com',
@@ -19,9 +20,16 @@ const randomDate = (start, end) => {
   return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
 }
 
-let QPS = process.env.QPS;
+let QPS = parseInt(process.env.QPS);
 let QPSlimit = 200;
 const loadTest = () => {
+  osUtil.cpuUsage((v) => {
+    statsDClient.gauge('.loadTester.cpu.percent', v);
+  })
+  statsDClient.gauge('.loadTester.memory.used.percent', ((os.totalmem() - os.freemem()) / os.totalmem()));
+  statsDClient.gauge('.loadTester.memory.used.bytes', os.totalmem() - os.freemem());
+  statsDClient.gauge('.loadTester.memory.free.bytes', os.freemem());
+
   const zipcodes = [
     94102,94103,94104,94105,94107,94108,94109,94110,94111,94112,94114,94115,94116,
     94117,94118,94121,94122,94123,94124,94127,94129,94130,94131,94132,94133,94134,94158
@@ -36,22 +44,22 @@ const loadTest = () => {
   statsDClient.increment('.loadTester.query.all');
   const start = Date.now();
   // request.get(`https://housespot.herokuapp.com/json?zipcode=${zipcode}&startDate=${startDate}&endDate=${endDate}&granularity=${gran}`)
-  request.get(`http://13.57.98.222:3000/json?zipcode=${zipcode}&startDate=${startDate}&endDate=${endDate}&granularity=${gran}`)
+  request.get(`http://GateWayLoadBalancer-143526911.us-west-1.elb.amazonaws.com/json?zipcode=${zipcode}`)
   .then(data => {
     data = JSON.parse(data);
     statsDClient.increment('.loadTester.query.success');
     statsDClient.timing('.loadTester.query.success.latency_ms', Date.now() - start);
 
-    data.fire === "error" || data.fire === undefined ?
+    (data.fire === "error" || data.fire === undefined) ?
       statsDClient.increment('.loadTester.query.fire.fail') :
       statsDClient.increment('.loadTester.query.fire.success');
-    data.crime === "error" || data.crime === undefined ?
+    (data.crime === "error" || data.crime === undefined) ?
       statsDClient.increment('.loadTester.query.crime.fail') :
       statsDClient.increment('.loadTester.query.crime.success');
-    data.house === "error" || data.house === undefined ?
+    (data.house === "error" || data.house === undefined) ?
       statsDClient.increment('.loadTester.query.house.fail') :
       statsDClient.increment('.loadTester.query.house.success');
-    data.health === "error" || data.health === undefined ?
+    (data.health === "error" || data.health === undefined) ?
       statsDClient.increment('.loadTester.query.health.fail') :
       statsDClient.increment('.loadTester.query.health.success');
   })
@@ -62,6 +70,7 @@ const loadTest = () => {
   })
   // console.log('Pinged for zipcode:', zipcode);
   console.log('Current QPS:', QPS);
+  // console.log('Next timer:', testEnd);
 }
 
 let prevTest = null;
@@ -71,5 +80,5 @@ setInterval(() => {
     console.log('Current QPS:', QPS);
     prevTest = setInterval(loadTest, Math.round(1000 / QPS));
   }
-  QPS++;
+  QPS+=2;
 }, 1000 * 60)
