@@ -25,7 +25,7 @@ app.get('/*', (req, res) => {
   osUtil.cpuUsage((v) => {
     statsDClient.gauge('.gateway.cpu.percent', v);
   })
-  statsDClient.gauge('.gateway.memory.used.percent', (os.totalmem() - os.freemem() / os.totalmem()));
+  statsDClient.gauge('.gateway.memory.used.percent', ((os.totalmem() - os.freemem()) / os.totalmem()));
   statsDClient.gauge('.gateway.memory.used.bytes', os.totalmem() - os.freemem());
   statsDClient.gauge('.gateway.memory.free.bytes', os.freemem());
 

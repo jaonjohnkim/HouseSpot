@@ -22,7 +22,7 @@ const loadTest = () => {
   osUtil.cpuUsage((v) => {
     statsDClient.gauge('.loadTester.cpu.percent', v);
   })
-  statsDClient.gauge('.loadTester.memory.used.percent', (os.totalmem() - os.freemem() / os.totalmem()));
+  statsDClient.gauge('.loadTester.memory.used.percent', ((os.totalmem() - os.freemem()) / os.totalmem()));
   statsDClient.gauge('.loadTester.memory.used.bytes', os.totalmem() - os.freemem());
   statsDClient.gauge('.loadTester.memory.free.bytes', os.freemem());
 
