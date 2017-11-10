@@ -1,8 +1,8 @@
 const express = require('express');
 const async = require('async');
 const Prommise = require('bluebird');
-// const request = require('request-promise');
-const request = require('request');
+const request = require('request-promise');
+// const request = require('request');
 const app = express();
 const os = require('os');
 const osUtil = require('os-utils');
