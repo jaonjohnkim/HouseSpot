@@ -12,6 +12,7 @@ const statsDClient = new statsD({
   prefix: process.env.HOSTEDGRAPHITE_APIKEY
 });
 
+const gatewayNumber = 'one';
 
 const formatIntoObj = data => {
   return data.reduce((acc, val) => {
@@ -23,14 +24,14 @@ const formatIntoObj = data => {
 
 app.get('/*', (req, res) => {
   osUtil.cpuUsage((v) => {
-    statsDClient.gauge('.gateway.cpu.percent', v);
+    statsDClient.gauge('.gateway.'+ gatewayNumber +'.cpu.percent', v);
   })
-  statsDClient.gauge('.gateway.memory.used.percent', ((os.totalmem() - os.freemem()) / os.totalmem()));
-  statsDClient.gauge('.gateway.memory.used.bytes', os.totalmem() - os.freemem());
-  statsDClient.gauge('.gateway.memory.free.bytes', os.freemem());
+  statsDClient.gauge('.gateway.'+ gatewayNumber +'.memory.used.percent', ((os.totalmem() - os.freemem()) / os.totalmem()));
+  statsDClient.gauge('.gateway.'+ gatewayNumber +'.memory.used.bytes', os.totalmem() - os.freemem());
+  statsDClient.gauge('.gateway.'+ gatewayNumber +'.memory.free.bytes', os.freemem());
 
   const start = Date.now();
-  statsDClient.increment('.gateway.query.all');
+  statsDClient.increment('.gateway.'+ gatewayNumber +'.query.all');
   // console.log('Request:', req);
   if (req.query.length === 0) {
     res.send('Gateway Server Online');
@@ -42,9 +43,9 @@ app.get('/*', (req, res) => {
         // console.log('formatted:', formatIntoObj(response));
         try {
           res.send(formatIntoObj(response));
-          statsDClient.increment('.gateway.response.timeout');
-          statsDClient.increment('.gateway.response.success');
-          statsDClient.timing('.gateway.response.timeout.latency_ms', Date.now() - start);
+          statsDClient.increment('.gateway.'+ gatewayNumber +'.response.timeout');
+          statsDClient.increment('.gateway.'+ gatewayNumber +'.response.success');
+          statsDClient.timing('.gateway.'+ gatewayNumber +'.response.timeout.latency_ms', Date.now() - start);
           // try {
           //   global.fire.abort();
           // } catch(e) {}
@@ -77,16 +78,16 @@ app.get('/*', (req, res) => {
     //       }
     //     })
     //     .then(data => {
-    //       statsDClient.increment('.gateway.fire.query.response.success');
-    //       statsDClient.timing('.gateway.fire.query.response.success.latency_ms', Date.now() - start);
+    //       statsDClient.increment('.gateway.'+ gatewayNumber +'.fire.query.response.success');
+    //       statsDClient.timing('.gateway.'+ gatewayNumber +'.fire.query.response.success.latency_ms', Date.now() - start);
     //       // console.log('fire data:', data);
     //       const processed = {fire: JSON.parse(data)};
     //       response.push(processed);
     //       return processed;
     //     })
     //     .catch(err => {
-    //       statsDClient.increment('.gateway.fire.query.response.fail');
-    //       statsDClient.timing('.gateway.fire.query.response.fail.latency_ms', Date.now() - start);
+    //       statsDClient.increment('.gateway.'+ gatewayNumber +'.fire.query.response.fail');
+    //       statsDClient.timing('.gateway.'+ gatewayNumber +'.fire.query.response.fail.latency_ms', Date.now() - start);
     //
     //       console.error('Error getting fire data:', err);
     //       const processed = {fire: 'error'};
@@ -107,16 +108,16 @@ app.get('/*', (req, res) => {
     //       }
     //     })
     //     .then(data => {
-    //       statsDClient.increment('.gateway.house.query.response.success');
-    //       statsDClient.timing('.gateway.house.query.response.success.latency_ms', Date.now() - start);
+    //       statsDClient.increment('.gateway.'+ gatewayNumber +'.house.query.response.success');
+    //       statsDClient.timing('.gateway.'+ gatewayNumber +'.house.query.response.success.latency_ms', Date.now() - start);
     //       // console.log('house data:', data);
     //       const processed = {house: JSON.parse(data)};
     //       response.push(processed);
     //       return processed;
     //     })
     //     .catch(err => {
-    //       statsDClient.increment('.gateway.house.query.response.fail');
-    //       statsDClient.timing('.gateway.house.query.response.fail.latency_ms', Date.now() - start);
+    //       statsDClient.increment('.gateway.'+ gatewayNumber +'.house.query.response.fail');
+    //       statsDClient.timing('.gateway.'+ gatewayNumber +'.house.query.response.fail.latency_ms', Date.now() - start);
     //       console.error('Error getting house data:', err);
     //       const processed = {house: 'error'};
     //       response.push(processed);
@@ -133,12 +134,12 @@ app.get('/*', (req, res) => {
     //       // console.log('formatted:', formatIntoObj(data));
     //       res.status(200).send(formatIntoObj(data));
     //       clearTimeout(SLA);
-    //       statsDClient.increment('.gateway.response.success');
-    //       statsDClient.timing('.gateway.response.success.latency_ms', Date.now() - start);
+    //       statsDClient.increment('.gateway.'+ gatewayNumber +'.response.success');
+    //       statsDClient.timing('.gateway.'+ gatewayNumber +'.response.success.latency_ms', Date.now() - start);
     //     }
     //   } catch(e) {
-    //     statsDClient.increment('.gateway.response.fail');
-    //     statsDClient.timing('.gateway.response.fail.latency_ms', Date.now() - start);
+    //     statsDClient.increment('.gateway.'+ gatewayNumber +'.response.fail');
+    //     statsDClient.timing('.gateway.'+ gatewayNumber +'.response.fail.latency_ms', Date.now() - start);
     //     console.log("Hmm, we timed out, one or more microservices too slow:", e);
     //   }
     // })
@@ -157,16 +158,16 @@ app.get('/*', (req, res) => {
           }
         })
         .then(data => {
-          statsDClient.increment('.gateway.fire.query.response.success');
-          statsDClient.timing('.gateway.fire.query.response.success.latency_ms', Date.now() - start);
+          statsDClient.increment('.gateway.'+ gatewayNumber +'.fire.query.response.success');
+          statsDClient.timing('.gateway.'+ gatewayNumber +'.fire.query.response.success.latency_ms', Date.now() - start);
           // console.log('fire data:', data);
           const processed = {fire: JSON.parse(data)};
           response.push(processed);
           callback(null, processed);
         })
         .catch(err => {
-          statsDClient.increment('.gateway.fire.query.response.fail');
-          statsDClient.timing('.gateway.fire.query.response.fail.latency_ms', Date.now() - start);
+          statsDClient.increment('.gateway.'+ gatewayNumber +'.fire.query.response.fail');
+          statsDClient.timing('.gateway.'+ gatewayNumber +'.fire.query.response.fail.latency_ms', Date.now() - start);
 
           console.error('Error getting fire data:', err);
           const processed = {fire: 'error'};
@@ -187,16 +188,16 @@ app.get('/*', (req, res) => {
           }
         })
         .then(data => {
-          statsDClient.increment('.gateway.crime.query.response.success');
-          statsDClient.timing('.gateway.crime.query.response.success.latency_ms', Date.now() - start);
+          statsDClient.increment('.gateway.'+ gatewayNumber +'.crime.query.response.success');
+          statsDClient.timing('.gateway.'+ gatewayNumber +'.crime.query.response.success.latency_ms', Date.now() - start);
           // console.log('crime data:', data);
           const processed = {crime: JSON.parse(data)};
           response.push(processed);
           callback(null, processed);
         })
         .catch(err => {
-          statsDClient.increment('.gateway.crime.query.response.fail');
-          statsDClient.timing('.gateway.crime.query.response.fail.latency_ms', Date.now() - start);
+          statsDClient.increment('.gateway.'+ gatewayNumber +'.crime.query.response.fail');
+          statsDClient.timing('.gateway.'+ gatewayNumber +'.crime.query.response.fail.latency_ms', Date.now() - start);
           console.error('Error getting crime data:', err);
           const processed = {crime: 'error'};
           response.push(processed);
@@ -216,16 +217,16 @@ app.get('/*', (req, res) => {
           }
         })
         .then(data => {
-          statsDClient.increment('.gateway.health.query.response.success');
-          statsDClient.timing('.gateway.health.query.response.success.latency_ms', Date.now() - start);
+          statsDClient.increment('.gateway.'+ gatewayNumber +'.health.query.response.success');
+          statsDClient.timing('.gateway.'+ gatewayNumber +'.health.query.response.success.latency_ms', Date.now() - start);
           // console.log('health inspeciton data:', data);
           const processed = {healthInspection: JSON.parse(data)};
           response.push(processed);
           callback(null, processed);
         })
         .catch(err => {
-          statsDClient.increment('.gateway.health.query.response.fail');
-          statsDClient.timing('.gateway.health.query.response.fail.latency_ms', Date.now() - start);
+          statsDClient.increment('.gateway.'+ gatewayNumber +'.health.query.response.fail');
+          statsDClient.timing('.gateway.'+ gatewayNumber +'.health.query.response.fail.latency_ms', Date.now() - start);
           console.error('Error getting health inspection data:', err);
           const processed = {health: 'error'};
           response.push(processed);
@@ -244,16 +245,16 @@ app.get('/*', (req, res) => {
           }
         })
         .then(data => {
-          statsDClient.increment('.gateway.house.query.response.success');
-          statsDClient.timing('.gateway.house.query.response.success.latency_ms', Date.now() - start);
+          statsDClient.increment('.gateway.'+ gatewayNumber +'.house.query.response.success');
+          statsDClient.timing('.gateway.'+ gatewayNumber +'.house.query.response.success.latency_ms', Date.now() - start);
           // console.log('house data:', data);
           const processed = {house: JSON.parse(data)};
           response.push(processed);
           callback(null, processed);
         })
         .catch(err => {
-          statsDClient.increment('.gateway.house.query.response.fail');
-          statsDClient.timing('.gateway.house.query.response.fail.latency_ms', Date.now() - start);
+          statsDClient.increment('.gateway.'+ gatewayNumber +'.house.query.response.fail');
+          statsDClient.timing('.gateway.'+ gatewayNumber +'.house.query.response.fail.latency_ms', Date.now() - start);
           console.error('Error getting house data:', err);
           const processed = {house: 'error'};
           response.push(processed);
@@ -272,12 +273,12 @@ app.get('/*', (req, res) => {
             // console.log('formatted:', formatIntoObj(data));
             res.status(200).send(formatIntoObj(data));
             clearTimeout(SLA);
-            statsDClient.increment('.gateway.response.success');
-            statsDClient.timing('.gateway.response.success.latency_ms', Date.now() - start);
+            statsDClient.increment('.gateway.'+ gatewayNumber +'.response.success');
+            statsDClient.timing('.gateway.'+ gatewayNumber +'.response.success.latency_ms', Date.now() - start);
           }
         } catch(e) {
-          statsDClient.increment('.gateway.response.fail');
-          statsDClient.timing('.gateway.response.fail.latency_ms', Date.now() - start);
+          statsDClient.increment('.gateway.'+ gatewayNumber +'.response.fail');
+          statsDClient.timing('.gateway.'+ gatewayNumber +'.response.fail.latency_ms', Date.now() - start);
           console.log("Hmm, we timed out, one or more microservices too slow:", e);
         }
       }
