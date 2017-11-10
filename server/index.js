@@ -1,5 +1,5 @@
 const express = require('express');
-// const async = require('async');
+const async = require('async');
 const Prommise = require('bluebird');
 const request = require('request-promise');
 const app = express();
@@ -22,12 +22,13 @@ const formatIntoObj = data => {
 }
 
 app.get('/*', (req, res) => {
-  statsDClient.gauge('.gateway.cpu.speed', parseInt(os.cpus().speed) * 1000000);
   osUtil.cpuUsage((v) => {
     statsDClient.gauge('.gateway.cpu.percent', v);
   })
-  statsDClient.gauge('.gateway.memory.used', os.totalmem() - os.freemem());
-  statsDClient.gauge('.gateway.memory.total', os.freemem());
+  statsDClient.gauge('.gateway.memory.used.percent', (os.totalmem() - os.freemem() / os.totalmem()));
+  statsDClient.gauge('.gateway.memory.used.bytes', os.totalmem() - os.freemem());
+  statsDClient.gauge('.gateway.memory.free.bytes', os.freemem());
+
   const start = Date.now();
   statsDClient.increment('.gateway.query.all');
   // console.log('Request:', req);
@@ -62,86 +63,8 @@ app.get('/*', (req, res) => {
       }
     }, 200);
 
-    const requests = [
-      () => {
-        return global.fire = request({
-          // url: "https://fireincident.herokuapp.com/json",
-          url: "http://13.57.114.167:3000/json",
-          method: "GET",
-          qs: {
-            zipcode: req.query.zipcode,
-            startDate: req.query.startDate,
-            endDate: req.query.endDate,
-            granularity: req.query.granularity
-          }
-        })
-        .then(data => {
-          statsDClient.increment('.gateway.fire.query.response.success');
-          statsDClient.timing('.gateway.fire.query.response.success.latency_ms', Date.now() - start);
-          // console.log('fire data:', data);
-          const processed = {fire: JSON.parse(data)};
-          response.push(processed);
-          return processed;
-        })
-        .catch(err => {
-          statsDClient.increment('.gateway.fire.query.response.fail');
-          statsDClient.timing('.gateway.fire.query.response.fail.latency_ms', Date.now() - start);
-
-          console.error('Error getting fire data:', err);
-          const processed = {fire: 'error'};
-          response.push(processed);
-          return processed;
-        })
-      },
-      () => {
-        return global.house = request({
-          url: "http://13.57.63.47:1337/json",
-          method: "GET",
-          qs: {
-            zipcode: req.query.zipcode,
-            startDate: req.query.startDate,
-            endDate: req.query.endDate,
-            granularity: req.query.granularity
-          }
-        })
-        .then(data => {
-          statsDClient.increment('.gateway.house.query.response.success');
-          statsDClient.timing('.gateway.house.query.response.success.latency_ms', Date.now() - start);
-          // console.log('house data:', data);
-          const processed = {house: JSON.parse(data)};
-          response.push(processed);
-          return processed;
-        })
-        .catch(err => {
-          statsDClient.increment('.gateway.house.query.response.fail');
-          statsDClient.timing('.gateway.house.query.response.fail.latency_ms', Date.now() - start);
-          console.error('Error getting house data:', err);
-          const processed = {house: 'error'};
-          response.push(processed);
-          return processed;
-        })
-      }
-    ];
-
-    Promise.all(requests).then(data => {
-      try {
-        // console.log('Gateway successfully read from the microservices, current response:', data);
-        if (!res.headersSent) {
-          // console.log('formatted:', formatIntoObj(data));
-          res.status(200).send(formatIntoObj(data));
-          clearTimeout(SLA);
-          statsDClient.increment('.gateway.response.success');
-          statsDClient.timing('.gateway.response.success.latency_ms', Date.now() - start);
-        }
-      } catch(e) {
-        statsDClient.increment('.gateway.response.fail');
-        statsDClient.timing('.gateway.response.fail.latency_ms', Date.now() - start);
-        console.log("Hmm, we timed out, one or more microservices too slow:", e);
-      }
-    })
-
-    // async.parallel([
-    //   callback => {
+    // const requests = [
+    //   () => {
     //     global.fire = request({
     //       // url: "https://fireincident.herokuapp.com/json",
     //       url: "http://13.57.114.167:3000/json",
@@ -159,7 +82,7 @@ app.get('/*', (req, res) => {
     //       // console.log('fire data:', data);
     //       const processed = {fire: JSON.parse(data)};
     //       response.push(processed);
-    //       callback(null, processed);
+    //       return processed;
     //     })
     //     .catch(err => {
     //       statsDClient.increment('.gateway.fire.query.response.fail');
@@ -168,68 +91,11 @@ app.get('/*', (req, res) => {
     //       console.error('Error getting fire data:', err);
     //       const processed = {fire: 'error'};
     //       response.push(processed);
-    //       callback(null, processed);
-    //     })
+    //       return processed;
+    //     });
+    //     return global.fire
     //   },
-    //   // callback => {
-    //   //   global.crime = request({
-    //   //     // url: "https://crime-spot.herokuapp.com/crime/json",
-    //   //     url: "http://ec2-52-53-166-50.us-west-1.compute.amazonaws.com:3000/crime/json",
-    //   //     method: "GET",
-    //   //     qs: {
-    //   //       zipcode: req.query.zipcode,
-    //   //       startDate: req.query.startDate,
-    //   //       endDate: req.query.endDate,
-    //   //       granularity: req.query.granularity
-    //   //     }
-    //   //   })
-    //   //   .then(data => {
-    //   //     statsDClient.increment('.gateway.crime.query.response.success');
-    //   //     statsDClient.timing('.gateway.crime.query.response.success.latency_ms', Date.now() - start);
-    //   //     // console.log('crime data:', data);
-    //   //     const processed = {crime: JSON.parse(data)};
-    //   //     response.push(processed);
-    //   //     callback(null, processed);
-    //   //   })
-    //   //   .catch(err => {
-    //   //     statsDClient.increment('.gateway.crime.query.response.fail');
-    //   //     statsDClient.timing('.gateway.crime.query.response.fail.latency_ms', Date.now() - start);
-    //   //     console.error('Error getting crime data:', err);
-    //   //     const processed = {crime: 'error'};
-    //   //     response.push(processed);
-    //   //     callback(null, processed);
-    //   //   })
-    //   // },
-    //   // callback => {
-    //   //   global.health = request({
-    //   //     // url: "https://healthinspectiondata.herokuapp.com/inspectionscore/json",
-    //   //     url: "http://ec2-13-56-213-244.us-west-1.compute.amazonaws.com:3000/inspectionscore/json",
-    //   //     method: "GET",
-    //   //     qs: {
-    //   //       zipcode: req.query.zipcode,
-    //   //       startDate: req.query.startDate,
-    //   //       endDate: req.query.endDate,
-    //   //       granularity: req.query.granularity
-    //   //     }
-    //   //   })
-    //   //   .then(data => {
-    //   //     statsDClient.increment('.gateway.health.query.response.success');
-    //   //     statsDClient.timing('.gateway.health.query.response.success.latency_ms', Date.now() - start);
-    //   //     // console.log('health inspeciton data:', data);
-    //   //     const processed = {healthInspection: JSON.parse(data)};
-    //   //     response.push(processed);
-    //   //     callback(null, processed);
-    //   //   })
-    //   //   .catch(err => {
-    //   //     statsDClient.increment('.gateway.health.query.response.fail');
-    //   //     statsDClient.timing('.gateway.health.query.response.fail.latency_ms', Date.now() - start);
-    //   //     console.error('Error getting health inspection data:', err);
-    //   //     const processed = {health: 'error'};
-    //   //     response.push(processed);
-    //   //     callback(null, processed);
-    //   //   })
-    //   // },
-    //   callback => {
+    //   () => {
     //     global.house = request({
     //       url: "http://13.57.63.47:1337/json",
     //       method: "GET",
@@ -246,7 +112,7 @@ app.get('/*', (req, res) => {
     //       // console.log('house data:', data);
     //       const processed = {house: JSON.parse(data)};
     //       response.push(processed);
-    //       callback(null, processed);
+    //       return processed;
     //     })
     //     .catch(err => {
     //       statsDClient.increment('.gateway.house.query.response.fail');
@@ -254,31 +120,168 @@ app.get('/*', (req, res) => {
     //       console.error('Error getting house data:', err);
     //       const processed = {house: 'error'};
     //       response.push(processed);
-    //       callback(null, processed);
+    //       return processed;
     //     })
+    //     return global.house;
     //   }
-    // ], (err, data) => {
-    //   if (err) {
-    //     console.error('Error getting data:', err);
-    //     // response.push(err);
-    //     // res.status(400).send(err);
-    //   } else {
-    //     try {
-    //       // console.log('Gateway successfully read from the microservices, current response:', data);
-    //       if (!res.headersSent) {
-    //         // console.log('formatted:', formatIntoObj(data));
-    //         res.status(200).send(formatIntoObj(data));
-    //         clearTimeout(SLA);
-    //         statsDClient.increment('.gateway.response.success');
-    //         statsDClient.timing('.gateway.response.success.latency_ms', Date.now() - start);
-    //       }
-    //     } catch(e) {
-    //       statsDClient.increment('.gateway.response.fail');
-    //       statsDClient.timing('.gateway.response.fail.latency_ms', Date.now() - start);
-    //       console.log("Hmm, we timed out, one or more microservices too slow:", e);
+    // ];
+    //
+    // Promise.all(requests).then(data => {
+    //   try {
+    //     // console.log('Gateway successfully read from the microservices, current response:', data);
+    //     if (!res.headersSent) {
+    //       // console.log('formatted:', formatIntoObj(data));
+    //       res.status(200).send(formatIntoObj(data));
+    //       clearTimeout(SLA);
+    //       statsDClient.increment('.gateway.response.success');
+    //       statsDClient.timing('.gateway.response.success.latency_ms', Date.now() - start);
     //     }
+    //   } catch(e) {
+    //     statsDClient.increment('.gateway.response.fail');
+    //     statsDClient.timing('.gateway.response.fail.latency_ms', Date.now() - start);
+    //     console.log("Hmm, we timed out, one or more microservices too slow:", e);
     //   }
     // })
+
+    async.parallel([
+      callback => {
+        global.fire = request({
+          // url: "https://fireincident.herokuapp.com/json",
+          url: "http://13.57.114.167:3000/json",
+          method: "GET",
+          qs: {
+            zipcode: req.query.zipcode,
+            startDate: req.query.startDate,
+            endDate: req.query.endDate,
+            granularity: req.query.granularity
+          }
+        })
+        .then(data => {
+          statsDClient.increment('.gateway.fire.query.response.success');
+          statsDClient.timing('.gateway.fire.query.response.success.latency_ms', Date.now() - start);
+          // console.log('fire data:', data);
+          const processed = {fire: JSON.parse(data)};
+          response.push(processed);
+          callback(null, processed);
+        })
+        .catch(err => {
+          statsDClient.increment('.gateway.fire.query.response.fail');
+          statsDClient.timing('.gateway.fire.query.response.fail.latency_ms', Date.now() - start);
+
+          console.error('Error getting fire data:', err);
+          const processed = {fire: 'error'};
+          response.push(processed);
+          callback(null, processed);
+        })
+      },
+      // callback => {
+      //   global.crime = request({
+      //     // url: "https://crime-spot.herokuapp.com/crime/json",
+      //     url: "http://13.57.91.80:3000/json",
+      //     method: "GET",
+      //     qs: {
+      //       zipcode: req.query.zipcode,
+      //       startDate: req.query.startDate,
+      //       endDate: req.query.endDate,
+      //       granularity: req.query.granularity
+      //     }
+      //   })
+      //   .then(data => {
+      //     statsDClient.increment('.gateway.crime.query.response.success');
+      //     statsDClient.timing('.gateway.crime.query.response.success.latency_ms', Date.now() - start);
+      //     // console.log('crime data:', data);
+      //     const processed = {crime: JSON.parse(data)};
+      //     response.push(processed);
+      //     callback(null, processed);
+      //   })
+      //   .catch(err => {
+      //     statsDClient.increment('.gateway.crime.query.response.fail');
+      //     statsDClient.timing('.gateway.crime.query.response.fail.latency_ms', Date.now() - start);
+      //     console.error('Error getting crime data:', err);
+      //     const processed = {crime: 'error'};
+      //     response.push(processed);
+      //     callback(null, processed);
+      //   })
+      // },
+      // callback => {
+      //   global.health = request({
+      //     // url: "https://healthinspectiondata.herokuapp.com/inspectionscore/json",
+      //     url: "http://52.9.19.99:3000/json",
+      //     method: "GET",
+      //     qs: {
+      //       zipcode: req.query.zipcode,
+      //       startDate: req.query.startDate,
+      //       endDate: req.query.endDate,
+      //       granularity: req.query.granularity
+      //     }
+      //   })
+      //   .then(data => {
+      //     statsDClient.increment('.gateway.health.query.response.success');
+      //     statsDClient.timing('.gateway.health.query.response.success.latency_ms', Date.now() - start);
+      //     // console.log('health inspeciton data:', data);
+      //     const processed = {healthInspection: JSON.parse(data)};
+      //     response.push(processed);
+      //     callback(null, processed);
+      //   })
+      //   .catch(err => {
+      //     statsDClient.increment('.gateway.health.query.response.fail');
+      //     statsDClient.timing('.gateway.health.query.response.fail.latency_ms', Date.now() - start);
+      //     console.error('Error getting health inspection data:', err);
+      //     const processed = {health: 'error'};
+      //     response.push(processed);
+      //     callback(null, processed);
+      //   })
+      // },
+      callback => {
+        global.house = request({
+          url: "http://13.57.63.47:1337/json",
+          method: "GET",
+          qs: {
+            zipcode: req.query.zipcode,
+            startDate: req.query.startDate,
+            endDate: req.query.endDate,
+            granularity: req.query.granularity
+          }
+        })
+        .then(data => {
+          statsDClient.increment('.gateway.house.query.response.success');
+          statsDClient.timing('.gateway.house.query.response.success.latency_ms', Date.now() - start);
+          // console.log('house data:', data);
+          const processed = {house: JSON.parse(data)};
+          response.push(processed);
+          callback(null, processed);
+        })
+        .catch(err => {
+          statsDClient.increment('.gateway.house.query.response.fail');
+          statsDClient.timing('.gateway.house.query.response.fail.latency_ms', Date.now() - start);
+          console.error('Error getting house data:', err);
+          const processed = {house: 'error'};
+          response.push(processed);
+          callback(null, processed);
+        })
+      }
+    ], (err, data) => {
+      if (err) {
+        console.error('Error getting data:', err);
+        // response.push(err);
+        // res.status(400).send(err);
+      } else {
+        try {
+          // console.log('Gateway successfully read from the microservices, current response:', data);
+          if (!res.headersSent) {
+            // console.log('formatted:', formatIntoObj(data));
+            res.status(200).send(formatIntoObj(data));
+            clearTimeout(SLA);
+            statsDClient.increment('.gateway.response.success');
+            statsDClient.timing('.gateway.response.success.latency_ms', Date.now() - start);
+          }
+        } catch(e) {
+          statsDClient.increment('.gateway.response.fail');
+          statsDClient.timing('.gateway.response.fail.latency_ms', Date.now() - start);
+          console.log("Hmm, we timed out, one or more microservices too slow:", e);
+        }
+      }
+    })
   }
 })
 

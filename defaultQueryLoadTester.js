@@ -19,12 +19,12 @@ const stringifyDate = (date) => {
 let QPS = process.env.QPS;
 let QPSlimit = 200;
 const loadTest = () => {
-  statsDClient.gauge('.loadTester.cpu.total', os.cpus());
   osUtil.cpuUsage((v) => {
     statsDClient.gauge('.loadTester.cpu.percent', v);
   })
-  statsDClient.gauge('.loadTester.memory.used', os.totalmem() - os.freemem());
-  statsDClient.gauge('.loadTester.memory.total', os.freemem());
+  statsDClient.gauge('.loadTester.memory.used.percent', (os.totalmem() - os.freemem() / os.totalmem()));
+  statsDClient.gauge('.loadTester.memory.used.bytes', os.totalmem() - os.freemem());
+  statsDClient.gauge('.loadTester.memory.free.bytes', os.freemem());
 
   const zipcodes = [
     94102,94103,94104,94105,94107,94108,94109,94110,94111,94112,94114,94115,94116,
