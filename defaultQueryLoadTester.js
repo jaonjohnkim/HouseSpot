@@ -16,7 +16,7 @@ const stringifyDate = (date) => {
   return `${date.getFullYear()}-${month}-${dateNum}T00:00:00.000`;
 }
 
-let QPS = process.env.QPS;
+let QPS = parseInt(process.env.QPS);
 let QPSlimit = 200;
 const loadTest = () => {
   osUtil.cpuUsage((v) => {
@@ -76,5 +76,5 @@ setInterval(() => {
     console.log('Current QPS:', QPS);
     prevTest = setInterval(loadTest, Math.round(1000 / QPS));
   }
-  QPS++;
+  QPS+=5;
 }, 1000 * 60)
