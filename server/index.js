@@ -174,64 +174,64 @@ app.get('/*', (req, res) => {
           callback(null, processed);
         })
       },
-      // callback => {
-      //   global.crime = request({
-      //     // url: "https://crime-spot.herokuapp.com/crime/json",
-      //     url: "http://13.57.91.80:3000/json",
-      //     method: "GET",
-      //     qs: {
-      //       zipcode: req.query.zipcode,
-      //       startDate: req.query.startDate,
-      //       endDate: req.query.endDate,
-      //       granularity: req.query.granularity
-      //     }
-      //   })
-      //   .then(data => {
-      //     statsDClient.increment('.gateway.crime.query.response.success');
-      //     statsDClient.timing('.gateway.crime.query.response.success.latency_ms', Date.now() - start);
-      //     // console.log('crime data:', data);
-      //     const processed = {crime: JSON.parse(data)};
-      //     response.push(processed);
-      //     callback(null, processed);
-      //   })
-      //   .catch(err => {
-      //     statsDClient.increment('.gateway.crime.query.response.fail');
-      //     statsDClient.timing('.gateway.crime.query.response.fail.latency_ms', Date.now() - start);
-      //     console.error('Error getting crime data:', err);
-      //     const processed = {crime: 'error'};
-      //     response.push(processed);
-      //     callback(null, processed);
-      //   })
-      // },
-      // callback => {
-      //   global.health = request({
-      //     // url: "https://healthinspectiondata.herokuapp.com/inspectionscore/json",
-      //     url: "http://52.9.19.99:3000/json",
-      //     method: "GET",
-      //     qs: {
-      //       zipcode: req.query.zipcode,
-      //       startDate: req.query.startDate,
-      //       endDate: req.query.endDate,
-      //       granularity: req.query.granularity
-      //     }
-      //   })
-      //   .then(data => {
-      //     statsDClient.increment('.gateway.health.query.response.success');
-      //     statsDClient.timing('.gateway.health.query.response.success.latency_ms', Date.now() - start);
-      //     // console.log('health inspeciton data:', data);
-      //     const processed = {healthInspection: JSON.parse(data)};
-      //     response.push(processed);
-      //     callback(null, processed);
-      //   })
-      //   .catch(err => {
-      //     statsDClient.increment('.gateway.health.query.response.fail');
-      //     statsDClient.timing('.gateway.health.query.response.fail.latency_ms', Date.now() - start);
-      //     console.error('Error getting health inspection data:', err);
-      //     const processed = {health: 'error'};
-      //     response.push(processed);
-      //     callback(null, processed);
-      //   })
-      // },
+      callback => {
+        global.crime = request({
+          // url: "https://crime-spot.herokuapp.com/crime/json",
+          url: "http://13.57.91.80:3000/json",
+          method: "GET",
+          qs: {
+            zipcode: req.query.zipcode,
+            startDate: req.query.startDate,
+            endDate: req.query.endDate,
+            granularity: req.query.granularity
+          }
+        })
+        .then(data => {
+          statsDClient.increment('.gateway.crime.query.response.success');
+          statsDClient.timing('.gateway.crime.query.response.success.latency_ms', Date.now() - start);
+          // console.log('crime data:', data);
+          const processed = {crime: JSON.parse(data)};
+          response.push(processed);
+          callback(null, processed);
+        })
+        .catch(err => {
+          statsDClient.increment('.gateway.crime.query.response.fail');
+          statsDClient.timing('.gateway.crime.query.response.fail.latency_ms', Date.now() - start);
+          console.error('Error getting crime data:', err);
+          const processed = {crime: 'error'};
+          response.push(processed);
+          callback(null, processed);
+        })
+      },
+      callback => {
+        global.health = request({
+          // url: "https://healthinspectiondata.herokuapp.com/inspectionscore/json",
+          url: "http://52.9.19.99:3000/json",
+          method: "GET",
+          qs: {
+            zipcode: req.query.zipcode,
+            startDate: req.query.startDate,
+            endDate: req.query.endDate,
+            granularity: req.query.granularity
+          }
+        })
+        .then(data => {
+          statsDClient.increment('.gateway.health.query.response.success');
+          statsDClient.timing('.gateway.health.query.response.success.latency_ms', Date.now() - start);
+          // console.log('health inspeciton data:', data);
+          const processed = {healthInspection: JSON.parse(data)};
+          response.push(processed);
+          callback(null, processed);
+        })
+        .catch(err => {
+          statsDClient.increment('.gateway.health.query.response.fail');
+          statsDClient.timing('.gateway.health.query.response.fail.latency_ms', Date.now() - start);
+          console.error('Error getting health inspection data:', err);
+          const processed = {health: 'error'};
+          response.push(processed);
+          callback(null, processed);
+        })
+      },
       callback => {
         global.house = request({
           url: "http://13.57.63.47:1337/json",
