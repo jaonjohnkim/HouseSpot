@@ -43,8 +43,11 @@ const loadTest = () => {
   endDate = stringifyDate(endDate);
   statsDClient.increment('.loadTester.query.all');
   const start = Date.now();
-  // request.get(`https://housespot.herokuapp.com/json?zipcode=${zipcode}&startDate=${startDate}&endDate=${endDate}&granularity=${gran}`)
-  request.get(`http://GateWayLoadBalancer-143526911.us-west-1.elb.amazonaws.com/json?zipcode=${zipcode}`)
+  // request.get(`https://housespot.herokuapp.com/json?zipcode=${zipcode}&startDate=${startDate}&endDate=${endDate}&granularity=$
+  // request.get(`http://GateWayLoadBalancer-143526911.us-west-1.elb.amazonaws.com/json?zipcode=${zipcode}`)
+  request.get(`http://13.57.98.222:3000/json?zipcode=${zipcode}`) // gateway 1
+  // request.get(`http://13.57.114.167:3000/json?zipcode=${zipcode}`) // fire
+  // request.get(`http://13.57.63.47:1337/json?zipcode=${zipcode}`) // house
   .then(data => {
     data = JSON.parse(data);
     statsDClient.increment('.loadTester.query.success');
