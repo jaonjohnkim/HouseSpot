@@ -45,18 +45,18 @@ app.get('/*', (req, res) => {
           statsDClient.increment('.gateway.response.timeout');
           statsDClient.increment('.gateway.response.success');
           statsDClient.timing('.gateway.response.timeout.latency_ms', Date.now() - start);
-          try {
-            global.fire.abort();
-          } catch(e) {}
-          try {
-            global.crime.abort();
-          } catch(e) {}
-          try {
-            global.health.abort();
-          } catch(e) {}
-          try {
-            global.house.abort();
-          } catch(e) {}
+          // try {
+          //   global.fire.abort();
+          // } catch(e) {}
+          // try {
+          //   global.crime.abort();
+          // } catch(e) {}
+          // try {
+          //   global.health.abort();
+          // } catch(e) {}
+          // try {
+          //   global.house.abort();
+          // } catch(e) {}
         } catch(e) {
           // console.log("It's okay, we delivered, ignore");
         }
